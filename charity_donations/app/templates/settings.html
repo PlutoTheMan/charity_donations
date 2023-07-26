@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block 'body' %}
+<form method="post" action="/settings/edit_personal_data" class="form_user_edit">
+    {% csrf_token %}
+    <p>Dane użytkownika:</p>
+    {{form.as_p}}
+    <button type="submit">Edytuj</button>
+</form>
+
+<form method="post" action="/settings/edit_password" class="form_user_password">
+    {% csrf_token %}
+    <p class="title">Zmiana hasła:</p>
+    {{form_password.as_p}}
+    <button type="submit">Zmień hasło</button>
+    {% if request.session.msg_password_success %}
+    <p style="color: green">{{ request.session.msg_password_success }}</p>
+    {% endif %}
+    {% if request.session.err_password %}
+    <p style="color: red">{{ request.session.err_password }}</p>
+    {% endif %}
+</form>
+
+{% endblock %}

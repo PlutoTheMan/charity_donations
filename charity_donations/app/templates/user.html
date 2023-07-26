@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+    {% block 'body' %}
+        <div style="text-align: center; margin: 10px;">
+            <p>Name: {{user.first_name}}</p>
+            <p>Last Name: {{user.last_name}}</p>
+            <p>Email: {{user.email}}</p>
+        </div>
+
+        <div style="text-align: center;">
+            <p style="color: green; font-weight: bold">Przekazane dary:</p>
+            LEGENDA:
+            <div style="display: inline-block; padding: 3px; background-color: #f3d75d; margin: 2px">
+                OCZEKUJE NA ODBIÓR
+            </div>
+
+            <div style="display: inline-block; padding: 3px; background-color: #27c027; margin: 2px">
+                ODEBRANE
+            </div>
+            <ul style="list-style-type: none; padding: 0;">
+                [Sortowanie: "Najbliższy odbiór"]
+                {% for donation in user_donations_in_progress|dictsort:"pick_up_time"|dictsort:"pick_up_date"%}
+                <li style="margin: 2px;">
+                    <div {% if donation.picked_up %} style="display: inline-block; padding: 3px; background-color: #27c027; "
+                         {% else %}
+                         style="display: inline-block; padding: 3px; background-color: #f3d75d; "
+                         {% endif %}>
+                    <span style="color: blue; font-weight: bold;">Organizacja</span>: {{ donation.institution}},
+                    <span style="color: darkviolet; font-weight: bold;">Worków</span>: {{donation.quantity}},
+                    <span style="color: #d51111; font-weight: bold;">Katergorie</span>:
+                    {% for category in donation.categories.all %} {{category.name}}{% if not forloop.last %},{% endif %} {% endfor %}
+                    <span style="color: #000000; font-weight: bold;">Planowany odbiór</span>: {{ donation.pick_up_date}}, {{ donation.pick_up_time}}
+                    {% if donation.picked_up %}
+                       <span style="color: #000000; font-weight: bold;">Odebrano:</span>: {{ donation.picked_up_date}}, {{ donation.picked_up_time}}
+                    {% endif %}
+                    </div>
+                    <form style="display: inline-block" action="/mark_donation/{{donation.pk}}" method="POST">
+                        {% csrf_token %}
+                        <button>OZNACZ JAKO ODEBRANY</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <ul style="list-style-type: none; padding: 0;">
+                [Sortowanie: "Najnowsza data odbioru"]
+                {% for donation in user_donations_done|dictsort:"pick_up_time"|dictsort:"pick_up_date"|dictsortreversed:"picked_up_time"|dictsortreversed:"picked_up_date"%}
+                <li style="margin: 2px;">
+                    <div {% if donation.picked_up %} style="display: inline-block; padding: 3px; background-color: #27c027; "
+                         {% else %}
+                         style="display: inline-block; padding: 3px; background-color: #f3d75d; "
+                         {% endif %}>
+                    <span style="color: blue; font-weight: bold;">Organizacja</span>: {{ donation.institution}},
+                    <span style="color: darkviolet; font-weight: bold;">Worków</span>: {{donation.quantity}},
+                    <span style="color: #d51111; font-weight: bold;">Katergorie</span>:
+                    {% for category in donation.categories.all %} {{category.name}}{% if not forloop.last %},{% endif %} {% endfor %}
+                    <span style="color: #000000; font-weight: bold;">Planowany odbiór</span>: {{ donation.pick_up_date}}, {{ donation.pick_up_time}}
+                    {% if donation.picked_up %}
+                       <span style="color: #000000; font-weight: bold;">Odebrano:</span>: {{ donation.picked_up_date}}, {{ donation.picked_up_time}}
+                    {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endblock %}
